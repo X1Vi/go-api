@@ -8,4 +8,6 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 	r.GET("/", controllers.Ping)
+	r.POST("/createUser/", controllers.CreateUser)
+	r.POST("/createTodo/", controllers.CreateToDoHandler)
 }

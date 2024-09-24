@@ -1,4 +1,3 @@
-// models/models.go
 package models
 
 import (
@@ -6,19 +5,37 @@ import (
 	"gorm.io/gorm"
 )
 
-type Product struct {
+var db *gorm.DB
+
+// User model
+type User struct {
 	gorm.Model
-	Code  string
-	Price uint
+	Username string `gorm:"unique;not null"` // Username must be unique and non-null
+	ToDos    []ToDo // Define the relationship between User and ToDo
 }
 
-// Change to Exported Function
+// ToDo model
+type ToDo struct {
+	gorm.Model
+	ToDo   string `gorm:"not null"`      // ToDo field should be non-null
+	IsDone bool   `gorm:"default:false"` // IsDone defaults to false
+	UserID uint   // Foreign key for User
+	User   User   `gorm:"foreignKey:UserID"` // Define relationship
+}
+
+// MigrateModels initializes the database and runs schema migrations
 func MigrateModels() {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	var err error
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{}) // Open the database connection and assign to the global db
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect to the database")
 	}
 
-	// Migrate the schema
-	db.AutoMigrate(&Product{})
+	// Migrate the schema for all models
+	db.AutoMigrate(&User{}, &ToDo{})
+}
+
+// GetDb returns the initialized database connection
+func GetDb() *gorm.DB {
+	return db
 }
